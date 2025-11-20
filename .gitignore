@@ -1,0 +1,19 @@
+    # Virtual environments
+    venv/
+    .venv/
+
+    # Python bytecode
+    __pycache__/
+    *.pyc
+
+    # IDE-specific files
+    .idea/
+    .vscode/
+
+    # Logs and temporary files
+    *.log
+    *.tmp
+
+    # Distribution and build artifacts
+    dist/
+    build/
