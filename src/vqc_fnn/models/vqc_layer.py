@@ -2,10 +2,14 @@ from torch import nn
 import torch
 import pennylane as qml
 import numpy as np
-from IPython import embed
 import matplotlib.pyplot as plt
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.utils.input_encoder import InputEncoder
+
 class VQCLayer(nn.Module):
-    def __init__(self, num_qubits=6, n_layers=12, backend='default.qubit', encoder=None):
+    def __init__(self, num_qubits=6, n_layers=3, backend='default.qubit', encoder=None):
         super().__init__()
         self.num_qubits = num_qubits
         self.n_layers = n_layers
@@ -24,7 +28,7 @@ class VQCLayer(nn.Module):
                     qml.RY(weights[l, q, 0], q)
                     qml.RZ(weights[l, q, 1], q)
 
-                # re-encode inputs (gives frequency lift)
+                # re-encoding inputs (gives frequency lift)
                 qml.AngleEmbedding(inputs, wires=range(self.num_qubits))
 
                 # ring entanglement (shallow, local)
@@ -34,11 +38,13 @@ class VQCLayer(nn.Module):
             return [qml.expval(qml.PauliZ(i)) for i in range(self.num_qubits)]
 
         self.circuit = circuit
-
+        fig = qml.draw_mpl(self.circuit, decimals=2)
+        plt.show()
         # better weight init scale
-        weight_shape = (self.n_layers, self.num_qubits, 2)  # we only use 2 params/qubit now
-        std = 1 / np.sqrt(num_qubits)    # xavier-ish
+        weight_shape = (self.n_layers, self.num_qubits, 2)  
+        std = 1 / np.sqrt(num_qubits)
         self.weights = nn.Parameter(std * torch.randn(weight_shape))
+        print("debugging")
 
     def forward(self, input_):
         if input_.dim() == 1:
