@@ -4,6 +4,7 @@
 
     # Python bytecode
     __pycache__/
+    src/attention_block/__pycache__
     *.pyc
 
     # IDE-specific files
